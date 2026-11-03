@@ -1,21 +1,25 @@
+
 services:
   website:
     build:
       context: .
       dockerfile: Dockerfile
-
     container_name: parnutreiler
     restart: unless-stopped
-
     ports:
       - "8080:80"
-
     read_only: true
-
     tmpfs:
       - /var/cache/nginx
       - /var/run
       - /tmp
-
     security_opt:
       - no-new-privileges:true
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel --no-autoupdate --url http://website:80
+    depends_on:
+      - website
